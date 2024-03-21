@@ -1,0 +1,25 @@
+[package]
+name = "waybar-hypr-fullscreen-status"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4", features = ["cargo"] }
+hyprland = { version = "0.3", features = ["data", "tokio"], default-features = false }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[lints.clippy]
+enum_glob_use = "deny"
+pedantic  = "deny"
+nursery = "deny"
+unwrap_used = "deny"
+
+[profile.release]
+strip = true      # Strip symbols from binary   https://github.com/johnthagen/min-sized-rust
+lto = true        # Enable Link Time Optimisation
+opt-level = 'z'   # Optimize for size.
+codegen-units = 1 # Reduced to increase optimisations
+panic = "abort"   # Abort on panic
+
