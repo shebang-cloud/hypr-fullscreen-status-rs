@@ -1,6 +1,6 @@
 /// Aplication errors and conversions from dependent APIs errors.
 ///
-/// Included in crate::prelude
+/// Included in `crate::prelude`
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("DataNotFound {0}")]

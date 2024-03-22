@@ -1,6 +1,7 @@
 use clap::{command, value_parser, Arg, ArgGroup, ArgMatches};
 use waybar_hypr_fullscreen_status::{
     prelude::*, query_monitor_fullscreen_status_by_id, query_monitor_fullscreen_status_by_name,
+    status::Formatter,
 };
 
 /// Utility to output a text for a monitor full screen status.
@@ -14,7 +15,7 @@ use waybar_hypr_fullscreen_status::{
 fn main() -> Result<()> {
     let mut args = arg_matches();
 
-    let is_fullscreen = (args.remove_one::<u8>(MONITOR_ID).map_or_else(
+    let status = (args.remove_one::<u8>(MONITOR_ID).map_or_else(
         || {
             args.remove_one::<String>(MONITOR_NAME).map_or_else(
                 || {
@@ -28,15 +29,19 @@ fn main() -> Result<()> {
         query_monitor_fullscreen_status_by_id,
     ))?;
 
-    let status: String = if is_fullscreen {
-        args.remove_one::<String>(FULLSCREEN_TEXT)
-            .ok_or_else(|| Error::MissingArgument(FULLSCREEN_TEXT.to_string()))?
-    } else {
-        args.remove_one::<String>(NORMAL_TEXT)
-            .ok_or_else(|| Error::MissingArgument(NORMAL_TEXT.to_string()))?
-    };
+    let show_window_count = args.get_flag(SHOW_WINDOW_COUNT);
+    let fullscreen_text: String = args
+        .remove_one::<String>(FULLSCREEN_TEXT)
+        .ok_or_else(|| Error::MissingArgument(FULLSCREEN_TEXT.to_string()))?;
+    let normal_mode_text: String = args
+        .remove_one::<String>(NORMAL_TEXT)
+        .ok_or_else(|| Error::MissingArgument(NORMAL_TEXT.to_string()))?;
 
-    println!("{status}");
+    let formatter = Formatter::build(show_window_count)
+        .fullscreen_text(fullscreen_text)
+        .normal_mode_text(normal_mode_text);
+
+    println!("{}", formatter.format(&status));
     Ok(())
 }
 
@@ -44,6 +49,7 @@ const MONITOR_ID: &str = "monitor-id";
 const MONITOR_NAME: &str = "monitor-name";
 const FULLSCREEN_TEXT: &str = "fullscreen-text";
 const NORMAL_TEXT: &str = "normal-text";
+const SHOW_WINDOW_COUNT: &str = "show-window-count";
 
 /// Parse the command line arguments into a `ArgMatches`.
 ///
@@ -82,6 +88,12 @@ fn arg_matches() -> ArgMatches {
                 .long_help("Normal mode text")
                 .value_name("TEXT")
                 .default_value(""),
+        )
+        .arg(
+            Arg::new(SHOW_WINDOW_COUNT)
+                .long(SHOW_WINDOW_COUNT)
+                .long_help("Show window count in Full Screen mode")
+                .action(clap::ArgAction::SetTrue)
         )
         .get_matches()
 }

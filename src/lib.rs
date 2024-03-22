@@ -1,18 +1,20 @@
 mod error;
 pub mod prelude;
+pub mod status;
 
 use hyprland::{
     data::{Monitors, Workspaces},
     shared::HyprData,
 };
 pub use prelude::*;
+use status::Status;
 
 /// Query a monitor fullscreen status by name.
 /// The status is retrieved from the active workspace in this monitor.
 ///
 /// # Errors
 /// Propagate any `HyprError`
-pub fn query_monitor_fullscreen_status_by_name(name: impl AsRef<str>) -> Result<bool> {
+pub fn query_monitor_fullscreen_status_by_name(name: impl AsRef<str>) -> Result<Status> {
     let monitor = Monitors::get()?
         .find(|mon| mon.name == name.as_ref())
         .ok_or_else(|| Error::DataNotFound(format!("monitor.name = {}", name.as_ref())))?;
@@ -25,7 +27,7 @@ pub fn query_monitor_fullscreen_status_by_name(name: impl AsRef<str>) -> Result<
 ///
 /// # Errors
 /// Propagate any `HyprError`
-pub fn query_monitor_fullscreen_status_by_id(id: u8) -> Result<bool> {
+pub fn query_monitor_fullscreen_status_by_id(id: u8) -> Result<Status> {
     let id = i128::from(id);
     let monitor = Monitors::get()?
         .find(|mon| mon.id == id)
@@ -38,10 +40,13 @@ pub fn query_monitor_fullscreen_status_by_id(id: u8) -> Result<bool> {
 ///
 /// # Errors
 /// Propagate any `HyprError`
-fn query_workspace_fullscreen_status(workspace_id: i32) -> Result<bool> {
+fn query_workspace_fullscreen_status(workspace_id: i32) -> Result<Status> {
     let workspace = Workspaces::get()?
         .find(|ws| ws.id == workspace_id)
         .ok_or_else(|| Error::DataNotFound(format!("workspace.id = {workspace_id}")))?;
 
-    Ok(workspace.fullscreen)
+    Ok(Status {
+        is_fullscreen: workspace.fullscreen,
+        window_count: workspace.windows,
+    })
 }
