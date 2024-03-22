@@ -1,8 +1,16 @@
 use clap::{command, value_parser, Arg, ArgGroup, ArgMatches};
 use waybar_hypr_fullscreen_status::{
-    prelude::*, query_fullscreen_status_by_monitor_id, query_fullscreen_status_by_monitor_name,
+    prelude::*, query_monitor_fullscreen_status_by_id, query_monitor_fullscreen_status_by_name,
 };
 
+/// Utility to output a text for a monitor full screen status.
+/// The full screen state is retrieved from the active workspace in this monitor.
+///
+/// Note that it is required to receive either a --monitor-id <ID> or --monitor-name <NAME>.
+/// Optional arguments are: --fullscreen-text <TEXT> and --normal-text <TEXT>.
+///
+/// Ex.: ./waybar-hypr-fullscreen-status --monitor-id 0
+/// Ex.: ./waybar-hypr-fullscreen-status --monitor-name DP-1
 fn main() -> Result<()> {
     let mut args = arg_matches();
 
@@ -14,10 +22,10 @@ fn main() -> Result<()> {
                         "{MONITOR_ID} or {MONITOR_NAME}"
                     )))
                 },
-                query_fullscreen_status_by_monitor_name,
+                query_monitor_fullscreen_status_by_name,
             )
         },
-        query_fullscreen_status_by_monitor_id,
+        query_monitor_fullscreen_status_by_id,
     ))?;
 
     let status: String = if is_fullscreen {
@@ -37,6 +45,10 @@ const MONITOR_NAME: &str = "monitor-name";
 const FULLSCREEN_TEXT: &str = "fullscreen-text";
 const NORMAL_TEXT: &str = "normal-text";
 
+/// Parse the command line arguments into a `ArgMatches`.
+///
+/// Note that it is required to receive either a --monitor-id <ID> or --monitor-name <NAME>.
+/// Optional arguments are: --fullscreen-text <TEXT> and --normal-text <TEXT>.
 fn arg_matches() -> ArgMatches {
     command!()
         .arg(
