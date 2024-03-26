@@ -1,3 +1,5 @@
+use std::io::{stdout, Write};
+
 use clap::{command, value_parser, Arg, ArgGroup, ArgMatches};
 use waybar_hypr_fullscreen_status::{
     prelude::*, query_monitor_fullscreen_status_by_id, query_monitor_fullscreen_status_by_name,
@@ -29,7 +31,7 @@ fn main() -> Result<()> {
         query_monitor_fullscreen_status_by_id,
     ))?;
 
-    let show_window_count = args.get_flag(SHOW_WINDOW_COUNT);
+    let show_fullscreen_window_count = args.get_flag(SHOW_WINDOW_COUNT);
     let fullscreen_text: String = args
         .remove_one::<String>(FULLSCREEN_TEXT)
         .ok_or_else(|| Error::MissingArgument(FULLSCREEN_TEXT.to_string()))?;
@@ -37,11 +39,13 @@ fn main() -> Result<()> {
         .remove_one::<String>(NORMAL_TEXT)
         .ok_or_else(|| Error::MissingArgument(NORMAL_TEXT.to_string()))?;
 
-    let formatter = Formatter::build(show_window_count)
-        .fullscreen_text(fullscreen_text)
-        .normal_mode_text(normal_mode_text);
+    let formatter = Formatter {
+        show_fullscreen_window_count,
+        fullscreen_text,
+        normal_mode_text,
+    };
 
-    println!("{}", formatter.format(&status));
+    writeln!(stdout(), "{}", formatter.format(&status))?;
     Ok(())
 }
 
