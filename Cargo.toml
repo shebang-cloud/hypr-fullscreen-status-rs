@@ -1,12 +1,13 @@
 [package]
-name = "waybar-hypr-fullscreen-status"
+name = "hypr-fullscreen-status"
 version = "0.1.0"
 edition = "2021"
+authors = ["Ricardo Nogueira"]
 
 [dependencies]
 clap = { version = "4", features = ["cargo"] }
-hyprland = { version = "0.3", features = ["data", "tokio"], default-features = false }
-itertools = "0.12.1"
+hyprland = { version = "0.3", features = ["listener", "tokio"], default-features = false }
+itertools = "0.12"
 thiserror = "1"
 
 [lints.rust]
@@ -24,4 +25,3 @@ lto = true        # Enable Link Time Optimisation
 opt-level = 'z'   # Optimize for size.
 codegen-units = 1 # Reduced to increase optimisations
 panic = "abort"   # Abort on panic
-
