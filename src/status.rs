@@ -33,7 +33,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn format_status() {
+    fn format_status_fullscreen_with_count() {
         let formatter = Formatter {
             show_fullscreen_window_count: true,
             fullscreen_text: "Full Screen".to_string(),
@@ -45,5 +45,35 @@ mod test {
             window_count: 2,
         };
         assert_eq!(formatter.format(&status), "Full Screen +1");
+    }
+
+    #[test]
+    fn format_status_fullscreen_hide_count_for_one_window() {
+        let formatter = Formatter {
+            show_fullscreen_window_count: true,
+            fullscreen_text: "Full Screen".to_string(),
+            normal_mode_text: String::new()
+        };
+
+        let status = Status {
+            is_fullscreen: true,
+            window_count: 1,
+        };
+        assert_eq!(formatter.format(&status), "Full Screen");
+    }
+
+    #[test]
+    fn format_status_normal_mode() {
+        let formatter = Formatter {
+            show_fullscreen_window_count: true,
+            fullscreen_text: "Full Screen".to_string(),
+            normal_mode_text: String::new()
+        };
+
+        let status = Status {
+            is_fullscreen: false,
+            window_count: 2,
+        };
+        assert_eq!(formatter.format(&status), "");
     }
 }

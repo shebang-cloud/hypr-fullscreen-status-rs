@@ -6,6 +6,7 @@ use hyprland::{
     data::{Monitor, Monitors, Workspaces},
     shared::HyprData,
 };
+
 pub use prelude::*;
 use status::Status;
 
@@ -21,17 +22,7 @@ pub fn query_monitor_fullscreen_status_by_name(name: impl AsRef<str>) -> Result<
         .find(|mon| mon.name == name.as_ref())
         .ok_or_else(|| {
             let names: Vec<String> = monitors.iter().map(|each| each.name.clone()).collect();
-            let msg = if names.len() == 1 {
-                "Only valid value is"
-            } else {
-                "Possible values are"
-            };
-            Error::DataNotFound(format!(
-                "monitor.name = {}. {} {}",
-                name.as_ref(),
-                msg,
-                names.join(", ")
-            ))
+            Error::DataNotFoundIn(format!("monitor.name = {}", name.as_ref()), names)
         })?;
 
     query_workspace_fullscreen_status(monitor.active_workspace.id)
@@ -47,16 +38,7 @@ pub fn query_monitor_fullscreen_status_by_id(id: u8) -> Result<Status> {
     let monitors: Vec<Monitor> = Monitors::get()?.collect();
     let monitor = monitors.iter().find(|mon| mon.id == id).ok_or_else(|| {
         let ids: Vec<String> = monitors.iter().map(|each| each.id.to_string()).collect();
-        let msg = if ids.len() == 1 {
-            "Only valid value is"
-        } else {
-            "Possible values are"
-        };
-        Error::DataNotFound(format!(
-            "monitor.id = {id}. {} {}",
-            msg,
-            ids.join(", ")
-        ))
+        Error::DataNotFoundIn(format!("monitor.id = {id}"), ids)
     })?;
 
     query_workspace_fullscreen_status(monitor.active_workspace.id)

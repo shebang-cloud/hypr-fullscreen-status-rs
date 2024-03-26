@@ -1,6 +1,6 @@
-use std::io::{stdout, Write};
-
 use clap::{command, value_parser, Arg, ArgGroup, ArgMatches};
+use std::io::{stderr, stdout, Write};
+
 use waybar_hypr_fullscreen_status::{
     prelude::*, query_monitor_fullscreen_status_by_id, query_monitor_fullscreen_status_by_name,
     status::Formatter,
@@ -15,11 +15,24 @@ use waybar_hypr_fullscreen_status::{
 /// Ex.: ./waybar-hypr-fullscreen-status --monitor-id 0
 /// Ex.: ./waybar-hypr-fullscreen-status --monitor-name DP-1
 fn main() -> Result<()> {
+    match get_status_message() {
+        Ok(msg) => writeln!(stdout(), "{msg}")?,
+        Err(err) => writeln!(stderr(), "{err}")?,
+    }
+
+    Ok(())
+}
+
+/// Get the fullscreen state message retrieved
+/// from the active workspace for the monitor specified in the arguments.
+fn get_status_message() -> Result<String> {
     let mut args = arg_matches();
 
-    let status = (args.remove_one::<u8>(MONITOR_ID).map_or_else(
+    let monitor_id: Option<u8> = args.remove_one(MONITOR_ID);
+    let status = monitor_id.map_or_else(
         || {
-            args.remove_one::<String>(MONITOR_NAME).map_or_else(
+            let monitor_name: Option<String> = args.remove_one(MONITOR_NAME);
+            monitor_name.map_or_else(
                 || {
                     Err(Error::MissingArgument(format!(
                         "{MONITOR_ID} or {MONITOR_NAME}"
@@ -29,8 +42,9 @@ fn main() -> Result<()> {
             )
         },
         query_monitor_fullscreen_status_by_id,
-    ))?;
+    )?;
 
+    // These arguments have default value:
     let show_fullscreen_window_count = args.get_flag(SHOW_WINDOW_COUNT);
     let fullscreen_text: String = args
         .remove_one::<String>(FULLSCREEN_TEXT)
@@ -39,21 +53,15 @@ fn main() -> Result<()> {
         .remove_one::<String>(NORMAL_TEXT)
         .ok_or_else(|| Error::MissingArgument(NORMAL_TEXT.to_string()))?;
 
+    // Output formatter:
     let formatter = Formatter {
         show_fullscreen_window_count,
         fullscreen_text,
         normal_mode_text,
     };
 
-    writeln!(stdout(), "{}", formatter.format(&status))?;
-    Ok(())
+    Ok(formatter.format(&status))
 }
-
-const MONITOR_ID: &str = "monitor-id";
-const MONITOR_NAME: &str = "monitor-name";
-const FULLSCREEN_TEXT: &str = "fullscreen-text";
-const NORMAL_TEXT: &str = "normal-text";
-const SHOW_WINDOW_COUNT: &str = "show-window-count";
 
 /// Parse the command line arguments into a `ArgMatches`.
 ///
@@ -97,7 +105,13 @@ fn arg_matches() -> ArgMatches {
             Arg::new(SHOW_WINDOW_COUNT)
                 .long(SHOW_WINDOW_COUNT)
                 .long_help("Show window count in Full Screen mode")
-                .action(clap::ArgAction::SetTrue)
+                .action(clap::ArgAction::SetTrue),
         )
         .get_matches()
 }
+
+const MONITOR_ID: &str = "monitor-id";
+const MONITOR_NAME: &str = "monitor-name";
+const FULLSCREEN_TEXT: &str = "fullscreen-text";
+const NORMAL_TEXT: &str = "normal-text";
+const SHOW_WINDOW_COUNT: &str = "show-window-count";
