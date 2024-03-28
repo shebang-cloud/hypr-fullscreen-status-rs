@@ -37,7 +37,7 @@ mod test {
         let formatter = Formatter {
             show_fullscreen_window_count: true,
             fullscreen_text: "Full Screen".to_string(),
-            normal_mode_text: String::new()
+            normal_mode_text: String::new(),
         };
 
         let status = Status {
@@ -52,7 +52,7 @@ mod test {
         let formatter = Formatter {
             show_fullscreen_window_count: true,
             fullscreen_text: "Full Screen".to_string(),
-            normal_mode_text: String::new()
+            normal_mode_text: String::new(),
         };
 
         let status = Status {
@@ -67,7 +67,7 @@ mod test {
         let formatter = Formatter {
             show_fullscreen_window_count: true,
             fullscreen_text: "Full Screen".to_string(),
-            normal_mode_text: String::new()
+            normal_mode_text: String::new(),
         };
 
         let status = Status {

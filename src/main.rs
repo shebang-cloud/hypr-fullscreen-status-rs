@@ -1,30 +1,20 @@
 use std::io::{stderr, Write};
 
-use hypr_fullscreen_status::{
-    args::{self, formatter, MONITOR_NAME},
-    listener::listen_monitor_fullsecreen_status_by_name,
-    prelude::*,
+use hypr_fullscreen_listener::{
+    args::Args, listener::listen_monitor_fullsecreen_status, prelude::*,
 };
 
 /// Utility to output a text for a monitor full screen status.
 /// The full screen state is retrieved from the active workspace in this monitor.
 ///
-/// Note that it is required to receive either a --monitor-id <ID> or --monitor-name <NAME>.
-/// Optional arguments are: --fullscreen-text <TEXT> and --normal-text <TEXT>.
+/// This executable blocks listening to status changes, always printing a new status line when it changes.
 ///
-/// Ex.: ./waybar-hypr-fullscreen-status --monitor-id 0
-/// Ex.: ./waybar-hypr-fullscreen-status --monitor-name DP-1
+/// Use command line --help options to see required and optional command line arguments.
 fn main() -> Result<()> {
-    let mut args = args::listener::matches();
-
-    let Some(monitor_name) = args.remove_one::<String>(MONITOR_NAME) else {
-        let err = Error::MissingArgument(MONITOR_NAME.to_string());
-        writeln!(stderr(), "{err}")?;
-        return Err(err);
-    };
-
-    let formatter = formatter(&mut args);
-    listen_monitor_fullsecreen_status_by_name(monitor_name, formatter)?;
+    match Args::from_arguments() {
+        Ok(args) => listen_monitor_fullsecreen_status(args)?,
+        Err(err) => writeln!(stderr(), "{err}")?,
+    }
 
     Ok(())
 }

@@ -3,40 +3,28 @@ use hyprland::{
     shared::HyprData,
 };
 
-use crate::prelude::*;
+use crate::{args::Args, prelude::*};
 
-/// Query a monitor fullscreen status by name.
+/// Query a monitor fullscreen status.
 /// The status is retrieved from the active workspace in this monitor.
 ///
 /// # Errors
 /// Propagate any `HyprError`
-pub fn monitor_fullscreen_status_by_name(name: impl AsRef<str>) -> Result<Status> {
+pub fn monitor_fullscreen_status(args: &Args) -> Result<String> {
+    let name = &args.monitor_name;
     let monitors: Vec<Monitor> = Monitors::get()?.collect();
     let monitor = monitors
         .iter()
-        .find(|mon| mon.name == name.as_ref())
+        .find(|mon| &mon.name == name)
         .ok_or_else(|| {
             let names: Vec<String> = monitors.iter().map(|each| each.name.clone()).collect();
-            Error::DataNotFoundIn(format!("monitor.name = {}", name.as_ref()), names)
+            Error::DataNotFoundIn(format!("monitor.name = {name}"), names)
         })?;
 
-    workspace_fullscreen_status(monitor.active_workspace.id)
-}
-
-/// Query a monitor fullscreen status by id.
-/// The status is retrieved from the active workspace in this monitor.
-///
-/// # Errors
-/// Propagate any `HyprError`
-pub fn monitor_fullscreen_status_by_id(id: u8) -> Result<Status> {
-    let id = i128::from(id);
-    let monitors: Vec<Monitor> = Monitors::get()?.collect();
-    let monitor = monitors.iter().find(|mon| mon.id == id).ok_or_else(|| {
-        let ids: Vec<String> = monitors.iter().map(|each| each.id.to_string()).collect();
-        Error::DataNotFoundIn(format!("monitor.id = {id}"), ids)
-    })?;
-
-    workspace_fullscreen_status(monitor.active_workspace.id)
+    match workspace_fullscreen_status(monitor.active_workspace.id) {
+        Ok(status) => Ok(args.formatter.format(&status)),
+        Err(err) => Err(err),
+    }
 }
 
 /// Query the fullscreen status of a workspace.
