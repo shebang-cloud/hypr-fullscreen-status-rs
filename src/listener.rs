@@ -1,4 +1,4 @@
-use hyprland::event_listener::EventListenerMutable;
+use hyprland::event_listener::EventListener;
 
 use crate::args::Args;
 use crate::prelude::*;
@@ -16,12 +16,10 @@ pub fn listen_monitor_fullsecreen_status(args: Args) -> Result<()> {
         println!("{status}");
     }
 
-    let mut event_listener = EventListenerMutable::new();
-    event_listener.add_fullscreen_state_change_handler(move |_, state| {
-        if state.active_monitor == args.monitor_name {
-            if let Ok(status) = query::monitor_fullscreen_status(&args) {
-                println!("{status}");
-            }
+    let mut event_listener = EventListener::new();
+    event_listener.add_fullscreen_state_change_handler(move |_| {
+        if let Ok(status) = query::monitor_fullscreen_status(&args) {
+            println!("{status}");
         }
     });
 

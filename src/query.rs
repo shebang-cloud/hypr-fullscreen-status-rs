@@ -1,5 +1,5 @@
 use hyprland::{
-    data::{Monitor, Monitors, Workspaces},
+    data::{Monitors, Workspaces},
     shared::HyprData,
 };
 
@@ -12,7 +12,7 @@ use crate::{args::Args, prelude::*};
 /// Propagate any `HyprError`
 pub fn monitor_fullscreen_status(args: &Args) -> Result<String> {
     let name = &args.monitor_name;
-    let monitors: Vec<Monitor> = Monitors::get()?.collect();
+    let monitors = Monitors::get()?;
     let monitor = monitors
         .iter()
         .find(|mon| &mon.name == name)
@@ -32,7 +32,9 @@ pub fn monitor_fullscreen_status(args: &Args) -> Result<String> {
 /// # Errors
 /// Propagate any `HyprError`
 fn workspace_fullscreen_status(workspace_id: i32) -> Result<Status> {
-    let workspace = Workspaces::get()?
+    let workspaces = Workspaces::get()?;
+    let workspace = workspaces
+        .iter()
         .find(|ws| ws.id == workspace_id)
         .ok_or_else(|| Error::DataNotFound(format!("workspace.id = {workspace_id}")))?;
 

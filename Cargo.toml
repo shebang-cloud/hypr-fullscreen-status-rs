@@ -6,7 +6,8 @@ authors = ["Ricardo Nogueira"]
 
 [dependencies]
 clap = { version = "4", features = ["cargo"] }
-hyprland = { version = "0.3", features = ["listener", "tokio"], default-features = false }
+# hyprland = { version = "0.3", features = ["listener", "tokio"], default-features = false }
+hyprland = { version = "0.4.0-alpha.2", features = ["listener", "tokio"], default-features = false, git = "https://github.com/hyprland-community/hyprland-rs" }
 itertools = "0.12"
 thiserror = "1"
 
