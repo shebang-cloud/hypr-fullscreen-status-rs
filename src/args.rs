@@ -7,6 +7,7 @@ const FULLSCREEN_TEXT: &str = "fullscreen-text";
 const NORMAL_TEXT: &str = "normal-text";
 const NO_SHOW_WINDOW_COUNT: &str = "no-show-window-count";
 
+#[derive(Debug, Clone)]
 pub struct Args {
     pub formatter: Formatter,
     pub monitor_name: String,

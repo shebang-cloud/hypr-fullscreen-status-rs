@@ -3,6 +3,7 @@ pub struct Status {
     pub window_count: u16,
 }
 
+#[derive(Debug, Clone)]
 pub struct Formatter {
     pub show_fullscreen_window_count: bool,
     pub fullscreen_text: String,
