@@ -2,7 +2,7 @@ use std::io::{stderr, Write};
 
 use hypr_fullscreen_listener::{
     args::Args,
-    listener::{listen_workspace_change, listen_monitor_fullsecreen_status},
+    listener::{listen_monitor_fullsecreen_status, listen_window_open, listen_workspace_change},
     prelude::*,
 };
 
@@ -23,13 +23,19 @@ fn main() -> Result<()> {
 
 fn run_with_args(args: Args) {
     let args1 = args.clone();
+    let args2 = args.clone();
+
     let desktop_thread = std::thread::spawn(move || {
-        let _ignore = listen_workspace_change(args1);
+        let _ignore = listen_workspace_change(args);
     });
     let fullscreen_thread = std::thread::spawn(move || {
-        let _ignore = listen_monitor_fullsecreen_status(args);
+        let _ignore = listen_monitor_fullsecreen_status(args1);
     });
-
+    let windon_open_thread = std::thread::spawn(move || {
+        let _ignore = listen_window_open(args2);
+    });
+    
     let _ignore = desktop_thread.join();
     let _ignore = fullscreen_thread.join();
+    let _ignore = windon_open_thread.join();
 }

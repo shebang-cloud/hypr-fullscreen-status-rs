@@ -48,3 +48,24 @@ pub fn listen_workspace_change(args: Args) -> Result<()> {
 
     Ok(())
 }
+
+
+/// Listen to window open events.
+///
+/// Output the current status and whenever a new window is openned.
+///
+/// # Errors
+/// Propagate any `HyprError`
+pub fn listen_window_open(args: Args) -> Result<()> {
+    let mut event_listener = EventListener::new();
+    event_listener.add_window_open_handler(move |_| {
+        if let Ok(status) = query::monitor_fullscreen_status(&args) {
+            println!("{status}");
+        }
+    });
+
+    // Listen to changes, blocks!
+    event_listener.start_listener()?;
+
+    Ok(())
+}
