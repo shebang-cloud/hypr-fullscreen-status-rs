@@ -17,7 +17,7 @@ pub fn listen_monitor_fullsecreen_status(args: Args) -> Result<()> {
     }
 
     let mut event_listener = EventListener::new();
-    event_listener.add_fullscreen_state_change_handler(move |_| {
+    event_listener.add_fullscreen_state_changed_handler(move |_| {
         if let Ok(status) = query::monitor_fullscreen_status(&args) {
             println!("{status}");
         }
@@ -37,7 +37,7 @@ pub fn listen_monitor_fullsecreen_status(args: Args) -> Result<()> {
 /// Propagate any `HyprError`
 pub fn listen_workspace_change(args: Args) -> Result<()> {
     let mut event_listener = EventListener::new();
-    event_listener.add_workspace_change_handler(move |_| {
+    event_listener.add_workspace_changed_handler(move |_| {
         if let Ok(status) = query::monitor_fullscreen_status(&args) {
             println!("{status}");
         }
@@ -58,7 +58,7 @@ pub fn listen_workspace_change(args: Args) -> Result<()> {
 /// Propagate any `HyprError`
 pub fn listen_window_open(args: Args) -> Result<()> {
     let mut event_listener = EventListener::new();
-    event_listener.add_window_open_handler(move |_| {
+    event_listener.add_window_opened_handler(move |_| {
         if let Ok(status) = query::monitor_fullscreen_status(&args) {
             println!("{status}");
         }
