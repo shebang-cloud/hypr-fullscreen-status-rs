@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use clap::{command, Arg, ArgMatches};
 
 use crate::{prelude::*, status::Formatter};
@@ -10,7 +12,7 @@ const NO_SHOW_WINDOW_COUNT: &str = "no-show-window-count";
 #[derive(Debug, Clone)]
 pub struct Args {
     pub formatter: Formatter,
-    pub monitor_name: String,
+    pub monitor_name: Arc<str>,
 }
 
 impl Args {
@@ -29,7 +31,7 @@ impl Args {
 
         Ok(Self {
             formatter,
-            monitor_name,
+            monitor_name: monitor_name.into(),
         })
     }
 }
@@ -38,11 +40,13 @@ fn build_formatter(args: &mut ArgMatches) -> Formatter {
     // These arguments have default value:
     let show_fullscreen_window_count = !args.get_flag(NO_SHOW_WINDOW_COUNT);
 
-    let fullscreen_text: String = args
+    let fullscreen_text: Arc<str> = (args
         .remove_one::<String>(FULLSCREEN_TEXT)
-        .unwrap_or_else(|| "Full Screen".to_string());
+        .unwrap_or_else(|| "Full Screen".into()))
+    .into();
 
-    let normal_mode_text: String = args.remove_one::<String>(NORMAL_TEXT).unwrap_or_default();
+    let normal_mode_text: Arc<str> =
+        (args.remove_one::<String>(NORMAL_TEXT).unwrap_or_default()).into();
 
     Formatter {
         show_fullscreen_window_count,
