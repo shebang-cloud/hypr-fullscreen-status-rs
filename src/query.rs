@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use hyprland::{
     data::{Monitors, Workspaces},
     shared::HyprData,
@@ -15,9 +17,9 @@ pub fn monitor_fullscreen_status(args: &Args) -> Result<String> {
     let monitors = Monitors::get()?;
     let monitor = monitors
         .iter()
-        .find(|mon| &mon.name == name)
+        .find(|mon| mon.name == **name)
         .ok_or_else(|| {
-            let names: Vec<String> = monitors.iter().map(|each| each.name.clone()).collect();
+            let names: Arc<[String]> = monitors.iter().map(|each| each.name.clone()).collect();
             Error::DataNotFoundIn(format!("monitor.name = {name}"), names)
         })?;
 
