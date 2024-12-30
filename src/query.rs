@@ -20,7 +20,7 @@ pub fn monitor_fullscreen_status(args: &Args) -> Result<String> {
         .find(|mon| mon.name == **name)
         .ok_or_else(|| {
             let names: Arc<[String]> = monitors.iter().map(|each| each.name.clone()).collect();
-            Error::DataNotFoundIn(format!("monitor.name = {name}"), names)
+            Error::DataNotFoundIn{data: format!("monitor.name = {name}"), values: names}
         })?;
 
     match workspace_fullscreen_status(monitor.active_workspace.id) {
